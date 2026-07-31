@@ -667,11 +667,10 @@ const projects = [
   { id:'pinpai', title:'品牌再造設計', sub:'圓石 LOGO 再造', cat:'graphic',
     desc:'選擇「圓石」這個品牌進行 LOGO 創意再造，以圓融為核心概念設計圓形外觀，並以【心】的精神文化與方瓶、茶葉意象結合，發展出文字形、圖案形與標準字三種版本。',
     pages:['pinpai-1','pinpai-5','pinpai-6'], videos:[] },
-  { id:'biaoxian', title:'產品表現技法', sub:'手繪產品表現', cat:'graphic',
+  { id:'biaoxian', title:'產品表現技法', sub:'手繪產品表現', cat:'graphic', ext:'png',
     desc:'以馬克筆與色鉛筆進行的產品表現技法練習，題材涵蓋電動工具、球鞋、玩具槍、熱水壺與吹風機等，訓練材質光影與透視結構的手繪掌握度。',
-    pages:['biaoxian1-1','biaoxian1-2','biaoxian1-3','biaoxian1-4','biaoxian1-5','biaoxian1-6',
-           'biaoxian2-1','biaoxian2-2','biaoxian2-3','biaoxian2-4','biaoxian2-5','biaoxian2-6',
-           'biaoxian3-1','biaoxian3-2','biaoxian3-3','biaoxian3-4','biaoxian3-5','biaoxian3-6'], videos:[] },
+    pages:['biaoxian1-4','biaoxian1-3','biaoxian1-1','biaoxian2-3','biaoxian2-2','biaoxian2-1',
+           'biaoxian1-5','biaoxian1-2','5-2','12-2','18.jpg'], videos:[] },
   { id:'fooddiary', title:'食記帳', sub:'Food Diary & Choice Assist ｜ 飲食紀錄與抉擇輔助', cat:'uiux', ext:'png',
     desc:'紀錄每一餐的美味，解救每一次的選擇障礙。專為解決「今天不知道要吃什麼」的選擇焦慮而生，以溫暖柔和的奶茶色系與微立體卡片，打造無壓力的飲食紀錄體驗。日曆與週計畫視圖能快速切換查看每日飲食歷程；飲食紀錄卡片整合三餐與點心，支援夾帶照片與 Google Maps 地點連結，串成專屬的美食地圖；內建的靈感轉盤（Choice Wheel）則能在猶豫不決時快速抽取飲食提案，增添互動樂趣。（第 3 張為 QR Code，掃描即可體驗完整原型）',
     pages:['fooddiary-1','fooddiary-2','fooddiary-3'], videos:[], qrIndex:2 },
@@ -688,9 +687,16 @@ const projects = [
 ];
 
 // 把每個作品的圖片＋影片合併成同一份「媒體清單」，lightbox 會依序播放
+// 若 id 本身已包含副檔名（例如 '18.jpg'）就直接使用，
+// 否則套用該作品集預設的副檔名（p.ext，預設 jpg）。
+// 這樣同一個作品集底下可以混用 png / jpg 等不同格式的圖片。
+function pageFile(id, ext){
+  return /\.[a-zA-Z0-9]+$/.test(id) ? id : `${id}.${ext}`;
+}
+
 function getMedia(p){
   const ext = p.ext || 'jpg';
-  const imgs = p.pages.map(id => ({ type:'image', src:`full/${id}.${ext}` }));
+  const imgs = p.pages.map(id => ({ type:'image', src:`full/${pageFile(id, ext)}` }));
   const vids = (p.videos || []).map(file => ({ type:'video', src:`videos/${file}` }));
   return [...imgs, ...vids];
 }
@@ -781,7 +787,7 @@ function renderGrid(filter){
           <span class="cat-chip">${catLabel[p.cat]}</span>
           ${hasVideo ? '<span class="cat-chip video-chip">▶ 含影片</span>' : ''}
           ${p.qrIndex!=null ? '<span class="cat-chip video-chip">📱 含 QR Code</span>' : ''}
-          <img src="thumbs/${cover}.${p.ext || 'jpg'}" alt="${p.title}" loading="lazy">
+          <img src="thumbs/${pageFile(cover, p.ext || 'jpg')}" alt="${p.title}" loading="lazy">
         </div>
         <div class="body">
           <h3>${p.title}</h3>
@@ -798,7 +804,7 @@ function renderGrid(filter){
       if(supportsHoverMagnify){
         attachMagnifier(thumbWrap, thumbImg, {
           zoom:2.4, lensSize:130, mode:'cover',
-          srcOverride: `full/${cover}.${p.ext || 'jpg'}`
+          srcOverride: `full/${pageFile(cover, p.ext || 'jpg')}`
         });
       }
       requestAnimationFrame(()=> setTimeout(()=> card.classList.add('in'), idx*40));
